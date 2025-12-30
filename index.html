@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <title>資産運用アプリ</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="favicon.ico" />
+  <meta name="theme-color" content="#e6f2ea" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <header class="header">
+    <h1>資産状況</h1>
+  </header>
+
+  <main class="app">
+
+    <div class="card green">
+      <div class="label">資産評価額</div>
+      <div id="totalAsset" class="amount">0<span>円</span></div>
+    </div>
+
+    <div class="card green">
+      <div class="label">評価損益</div>
+      <div id="profit" class="amount plus">0<span>円</span></div>
+    </div>
+
+    <div class="card green">
+      <div class="label">運用利回り（当初から）</div>
+      <div id="returnRate" class="amount">0<span>%</span></div>
+    </div>
+
+    <div class="card white">
+      <div class="label">年金資産推移</div>
+      <div class="sub">過去12か月</div>
+      <canvas id="assetChart"></canvas>
+    </div>
+
+  </main>
+
+  <script src="main.js"></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker registered'))
+        .catch(err => console.error(err));
+    }
+  </script>
+</body>
+</html>
