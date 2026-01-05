@@ -16,9 +16,66 @@
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* ログイン画面用 */
+    #loginOverlay {
+      position: fixed;
+      top:0; left:0; width:100%; height:100%;
+      background:#f6f8f7;
+      display:flex; justify-content:center; align-items:center; z-index:9999;
+    }
+    .login-card {
+      background:#fff;
+      padding:40px 30px;
+      border-radius:12px;
+      box-shadow:0 4px 16px rgba(0,0,0,0.1);
+      width:90%; max-width:400px;
+      text-align:center;
+    }
+    .login-card h1 { color:#4CAF50; margin-bottom:30px; font-size:24px; }
+    .login-card label { display:block; text-align:left; font-size:14px; margin-bottom:5px; color:#666; }
+    .login-card input {
+      width:100%; padding:12px 40px 12px 15px; margin-bottom:20px;
+      border:1px solid #ccc; border-radius:8px; font-size:16px; transition:border-color 0.3s;
+    }
+    .login-card input:focus { border-color:#4CAF50; outline:none; }
+    .login-card button {
+      width:100%; padding:12px; background:#4CAF50; border:none; border-radius:8px; color:#fff; font-size:16px; cursor:pointer;
+    }
+    .login-card button:hover { background:#45a049; }
+    .error { color:red; font-size:14px; margin-bottom:15px; display:none; }
+    .show-pass {
+      position:absolute; right:15px; top:40px; cursor:pointer; user-select:none;
+      color:#4CAF50; font-size:16px;
+    }
+    .inputWrapper { position:relative; }
+  </style>
 </head>
 
 <body>
+  <!-- ログイン画面 -->
+  <div id="loginOverlay">
+    <div class="login-card">
+      <h1>ログイン</h1>
+      <div class="error" id="loginError">口座番号またはパスワードが正しくありません</div>
+      
+      <div class="inputWrapper">
+        <label for="loginId">加入者口座番号（10桁）</label>
+        <input type="text" id="loginId" maxlength="10" placeholder="" pattern="\d{10}">
+      </div>
+
+      <div class="inputWrapper">
+        <label for="loginPw">パスワード</label>
+        <input type="password" id="loginPw" placeholder="">
+        <span class="show-pass" onclick="togglePw()">👁</span>
+      </div>
+
+      <button onclick="login()">ログイン</button>
+    </div>
+  </div>
+
+  <!-- 既存ページ（ログイン後表示） -->
   <header class="header">
     <h1>資産状況</h1>
   </header>
@@ -51,6 +108,42 @@
   <script src="main.js"></script>
 
   <script>
+    // サンプル口座データ（ログイン用）
+    const users = [
+      { id:"8879001454", pw:"1234" }
+    ];
+
+    // パスワード表示切替
+    function togglePw() {
+      const pw = document.getElementById('loginPw');
+      pw.type = (pw.type === 'password') ? 'text' : 'password';
+    }
+
+    // ログイン処理
+    function login() {
+      const id = document.getElementById('loginId').value;
+      const pw = document.getElementById('loginPw').value;
+      const error = document.getElementById('loginError');
+      error.style.display='none';
+
+      if(!/^\d{10}$/.test(id)){ 
+        error.textContent = "口座番号は10桁の半角数字のみ有効です";
+        error.style.display='block';
+        return;
+      }
+
+      const user = users.find(u=>u.id===id && u.pw===pw);
+      if(user){
+        // ログイン成功 → ログイン画面非表示
+        document.getElementById('loginOverlay').style.display='none';
+        // ここでmain.jsで資産グラフ等の初期化処理を行う
+      } else {
+        error.textContent="口座番号またはパスワードが正しくありません";
+        error.style.display='block';
+      }
+    }
+
+    // Service Worker登録
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
         .then(() => console.log('Service Worker registered'))
